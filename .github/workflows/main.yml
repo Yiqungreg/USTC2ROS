@@ -44,9 +44,7 @@ jobs:
         cp -rf ./blackip4 ./blackip4.conf
         cp -rf ./blackip6 ./blackip6.conf
         git checkout -b release
-        git add ./route4.conf
-        git add ./blackip4.conf
-        git add ./blackip6.conf
+        git add .
         git commit -am "Updated at $(date)"
         git remote add origin "https://${{ github.actor }}:${{ secrets.ACCESS_TOKEN }}@github.com/${{ github.repository }}"
         git push -f -u origin release
