@@ -26,9 +26,9 @@ jobs:
 
     - name: Obtain black IP lists
       run: |
-        curl -o publish/route4.conf "https://blackip.ustc.edu.cn/list.php?txt"
-        curl -o publish/blackip4.conf "https://blackip.ustc.edu.cn/list.php?txt"
-        curl -o publish/blackip6.conf "https://blackip.ustc.edu.cn/list.php?txt"
+        curl -o ./route4.conf "https://blackip.ustc.edu.cn/list.php?txt"
+        curl -o ./blackip4.conf "https://blackip.ustc.edu.cn/list.php?txt"
+        curl -o ./blackip6.conf "https://blackip.ustc.edu.cn/list.php?txt"
     - name: Push artifacts to release branch
       run: |
         git config --local user.email "action@github.com"
@@ -37,9 +37,6 @@ jobs:
         git checkout release
         git checkout --orphan release-orphan
         git rm -rf .
-        cp -rf publish/route4.conf ./
-        cp -rf publish/blackip4.conf ./
-        cp -rf publish/blackip6.conf ./
         git add route4.conf
         git add blackip4.conf
         git add blackip6.conf
