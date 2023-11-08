@@ -18,8 +18,8 @@ jobs:
     - name: Obtain black IP lists
       run: |
         curl -o ./route4.conf "https://blackip.ustc.edu.cn/list.php?txt"
-        curl -s https://blackip.ustc.edu.cn/list.php?txt | sed '/:/d' > publish/blackip4.conf
-        curl -s https://blackip.ustc.edu.cn/list.php?txt | sed '/\./d' > publish/blackip6.conf
+        curl -s https://blackip.ustc.edu.cn/list.php?txt | sed '/:/d' > ./blackip4.conf
+        curl -s https://blackip.ustc.edu.cn/list.php?txt | sed '/\./d' > ./blackip6.conf
     
     - name: Release and upload assets
       uses: svenstaro/upload-release-action@v2
