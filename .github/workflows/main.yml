@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
   
     steps:
-      - name: Get Upstream
+      - name: Generate private
         run: |
           curl -s https://blackip.ustc.edu.cn/list.php?txt | sed -e '/:/d'|sed -e '/^#.*/d' -e 's/^/route /g' -e 's/$/ "via Null"/g' > publish/route4.conf
           curl -s https://blackip.ustc.edu.cn/list.php?txt | sed '/:/d' > publish/blackip4.conf
