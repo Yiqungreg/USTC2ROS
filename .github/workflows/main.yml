@@ -29,24 +29,24 @@ jobs:
         curl -o ./route4.conf "https://blackip.ustc.edu.cn/list.php?txt"
         curl -o ./blackip4.conf "https://blackip.ustc.edu.cn/list.php?txt"
         curl -o ./blackip6.conf "https://blackip.ustc.edu.cn/list.php?txt"
-    - name: Push artifacts to release branch
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "github-action[bot]"
-        git fetch
-        git checkout release
-        git checkout --orphan release-orphan
-        git rm -rf .
-        git add route4.conf
-        git add blackip4.conf
-        git add blackip6.conf
-        git commit -am "Updated at $(date)"
-        git branch -D release
-        git branch -m release
-            
-    - name: GitHub Push
-      uses: ad-m/github-push-action@v0.6.0
+    
+    - name: Release and upload assets
+      uses: svenstaro/upload-release-action@v2
       with:
-        github_token: ${{ secrets.ACCESS_TOKEN }}
-        branch: release
-        force: true
+        repo_token: ${{ secrets.ACCESS_TOKEN }}
+        release_name: latest
+        tag: latest
+        file_glob: true
+        file: ./*
+ 
+    - name: Git push assets to "release" branch
+      run: |
+        cd ./publish || exit 1
+        git init
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git checkout -b release
+        git add .
+        git commit -m "${{ env.RELEASE_NAME }}"
+        git remote add origin "https://${{ github.actor }}:${{ secrets.ACCESS_TOKEN }}@github.com/${{ github.repository }}"
+        git push -f -u origin release
