@@ -37,16 +37,19 @@ jobs:
         git fetch
         git checkout release
         git checkout --orphan release-orphan
-        git rm -rf .
+        git rm -rf ./route4.conf
+        git rm -rf ./blackip4.conf
+        git rm -rf ./blackip6.conf
         cp -rf ./route4 ./route4.conf
         cp -rf ./blackip4 ./blackip4.conf
         cp -rf ./blackip6 ./blackip6.conf
-        git add route4.conf
-        git add blackip4.conf
-        git add blackip6.conf
+        git checkout -b release
+        git add ./route4.conf
+        git add ./blackip4.conf
+        git add ./blackip6.conf
         git commit -am "Updated at $(date)"
-        git branch -D release
-        git branch -m release
+        git remote add origin "https://${{ github.actor }}:${{ secrets.ACCESS_TOKEN }}@github.com/${{ github.repository }}"
+        git push -f -u origin release
             
     - name: GitHub Push
       uses: ad-m/github-push-action@v0.6.0
