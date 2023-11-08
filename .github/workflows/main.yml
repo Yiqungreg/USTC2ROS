@@ -1,44 +1,55 @@
-name: Build
+name: Update black IP list
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: "10 4 * * *"
   push:
-    branches:
-      - main
-    paths-ignore: 
-      - "**/README.md" 
+    branches: [ master ]
+  
+  workflow_dispatch:
+
+  schedule: 
+    - cron:  '10 12 * * *'
 
 jobs:
   build:
-    name: Build
+    name: Generate black IP list
     runs-on: ubuntu-latest
-  
     steps:
-      - name: Generate private
-        run: |
-          curl -s https://blackip.ustc.edu.cn/list.php?txt | sed -e '/:/d'|sed -e '/^#.*/d' -e 's/^/route /g' -e 's/$/ "via Null"/g' > publish/route4.conf
-          curl -s https://blackip.ustc.edu.cn/list.php?txt | sed '/:/d' > publish/blackip4.conf
-	  curl -s https://blackip.ustc.edu.cn/list.php?txt | sed '/\./d' > publish/blackip6.conf
- 
-       - name: Release and upload assets
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          release_name: latest
-          tag: latest
-          file_glob: true
-          file: ./publish/*
- 
-      - name: Git push assets to "release" branch
-        run: |
-          cd ./publish || exit 1
-          git init
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b release
-          git add .
-          git commit -m "${{ env.RELEASE_NAME }}"
-          git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
-          git push -f -u origin release
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Obtain black IP lists
+      run: |
+        curl -o publish/route4.conf "https://blackip.ustc.edu.cn/list.php?txt | sed -e '/:/d'|sed -e '/^#.*/d' -e 's/^/route /g' -e 's/$/ "via Null"/g'"
+        curl -o publish/blackip4.conf "https://blackip.ustc.edu.cn/list.php?txt | sed '/:/d'"
+        curl -o publish/blackip6.conf "https://blackip.ustc.edu.cn/list.php?txt | sed '/\./d'"
+    - name: Push artifacts to release branch
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "github-action[bot]"
+        git fetch
+        git checkout release
+        git checkout --orphan release-orphan
+        git rm -rf .
+        cp -rf publish/route4.conf ./
+        cp -rf publish/blackip4.conf ./
+        cp -rf publish/blackip6.conf ./
+        git add route4.conf
+        git add blackip4.conf
+        git add blackip6.conf
+        git commit -am "Updated at $(date)"
+        git branch -D release
+        git branch -m release
+            
+    - name: GitHub Push
+      uses: ad-m/github-push-action@v0.6.0
+      with:
+        github_token: ${{ secrets.ACCESS_TOKEN }}
+        branch: release
+        force: true
