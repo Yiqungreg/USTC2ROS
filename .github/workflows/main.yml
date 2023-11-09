@@ -15,15 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.14
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
-
     - name: Create dist folder
       run: mkdir -p dist
 
@@ -34,7 +25,9 @@ jobs:
       run: |
         CURRENT_DIR=$(pwd)
         cd dist
+        sed -e '/:/d'|sed -e '/^#.*/d' -e 's/^/route /g' -e 's/$/ "via Null"/g' ./ustcip.list > route4.conf
         sed '/:/d' ./ustcip.list > blackip4.conf
+        sed '/\./d' ./ustcip.list > blackip6.conf
         cd $CURRENT_DIR
 
     - name: Set env variables
@@ -46,7 +39,9 @@ jobs:
     - name: Push to release branch
       run: |
         mkdir publish
+        cp -af dist/route4.conf publish/route4.conf
         cp -af dist/blackip4.conf publish/blackip4.conf
+        cp -af dist/blackip6.conf publish/blackip6.conf
         cd publish
         git init
         git config --local user.name "${{ github.actor }}"
