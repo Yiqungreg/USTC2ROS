@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
   schedule: 
-    - cron:  '08 18 * * *'
+    - cron:  '12 18 * * *'
 
 jobs:
   build:
@@ -44,6 +44,8 @@ jobs:
         cp -af dist/route4.conf publish/route4.conf
         cp -af dist/blackip4.conf publish/blackip4.conf
         cp -af dist/blackip6.conf publish/blackip6.conf
+        cp -af dist/zzblocked4.rsc publish/zzblocked4.rsc
+        cp -af dist/zzblocked6.rsc publish/zzblocked6.rsc
         cd publish
         git init
         git config --local user.name "${{ github.actor }}"
