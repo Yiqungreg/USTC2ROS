@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
   schedule: 
-    - cron:  '10 12 * * *'
+    - cron:  '08 18 * * *'
 
 jobs:
   build:
@@ -25,9 +25,11 @@ jobs:
       run: |
         CURRENT_DIR=$(pwd)
         cd dist
-        sed -e '/:/d'|sed -e '/^#.*/d' -e 's/^/route /g' -e 's/$/ "via Null"/g' ./ustcip.list > route4.conf
+        sed -e '/:/d' -e '/^#.*/d' -e 's/^/route /g' -e 's/$/ "via Null"/g' ./ustcip.list > route4.conf
         sed '/:/d' ./ustcip.list > blackip4.conf
         sed '/\./d' ./ustcip.list > blackip6.conf
+        sed -e 's/^/add address=/g' -e 's/$/ list=zzblocked time=$ipt/g' -e $'1i\\\n:global ipt;:if ([:len $ipt] =0) do={:set ipt 0}' -e $'1i\\\n/ip firewall address-list' ./blackip4.conf > zzblocked4.rsc
+        sed -e 's/^/add address=/g' -e 's/$/ list=zzblocked6 time=$ipt/g' -e $'1i\\\n:global ipt;:if ([:len $ipt] =0) do={:set ipt 0}' -e $'1i\\\n/ipv6 firewall address-list' ./blackip6.conf > zzblocked6.rsc
         cd $CURRENT_DIR
 
     - name: Set env variables
