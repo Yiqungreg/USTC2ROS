@@ -20,7 +20,7 @@ jobs:
       with:
         go-version: ^1.14
       id: go
-		
+
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
@@ -36,7 +36,7 @@ jobs:
         cd dist
         sed '/:/d' ./ustcip.list > blackip4.conf
         cd $CURRENT_DIR
-	  
+
     - name: Set env variables
       run: |
         echo "RELEASE_NAME=$(date +%Y%m%d)" >> $GITHUB_ENV
