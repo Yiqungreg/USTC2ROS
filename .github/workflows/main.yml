@@ -18,8 +18,10 @@ jobs:
     - name: Create dist folder
       run: mkdir -p dist
 
-    - name: Obtain black IP lists
+    - name: Obtain USTC black IP lists
       run: curl -LR -o dist/ustcip.list "https://blackip.ustc.edu.cn/list.php?txt"
+      
+    - name: Obtain scanner IP lists
       run: curl -LR -o dist/scaners2.bak "https://cache-1.oss-cn-beijing.aliyuncs.com/file/scaners2.bak"
 
     - name: Generate black IP conf
